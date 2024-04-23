@@ -1,7 +1,7 @@
 # Virtual World Simulation
 
 A project for college.<br>
-Gdańsk University of Technology 2023, object-oriented programming
+Gdańsk University of Technology 2024, object-oriented programming
 
 ![Simulation](simulation.png)
 
