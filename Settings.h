@@ -1,0 +1,80 @@
+#ifndef VIRTUALWORLD_SETTINGS_H
+#define VIRTUALWORLD_SETTINGS_H
+
+// Organisms settings
+// Animals
+
+#define WOLF_STRENGTH 9
+#define WOLF_INITIATIVE 5
+#define WOLF_SYMBOL 'W'
+#define WOLF_COLOR Color::GRAY
+
+#define SHEEP_STRENGTH 4
+#define SHEEP_INITIATIVE 4
+#define SHEEP_SYMBOL 'S'
+#define SHEEP_COLOR Color::WHITE
+
+#define FOX_STRENGTH 3
+#define FOX_INITIATIVE 7
+#define FOX_SYMBOL 'F'
+#define FOX_COLOR Color::RED
+
+#define TURTLE_STRENGTH 2
+#define TURTLE_INITIATIVE 1
+#define TURTLE_SYMBOL 'T'
+#define TURTLE_COLOR Color::GREEN
+
+#define ANTELOPE_STRENGTH 4
+#define ANTELOPE_INITIATIVE 4
+#define ANTELOPE_SYMBOL 'A'
+#define ANTELOPE_COLOR Color::YELLOW
+
+// Plants
+
+#define GRASS_STRENGTH 0
+#define GRASS_SYMBOL '*'
+#define GRASS_COLOR Color::BLUE
+
+#define MILKWEED_STRENGTH 0
+#define MILKWEED_SYMBOL '+'
+#define MILKWEED_COLOR Color::BLUE
+
+#define GUARANA_STRENGTH 0
+#define GUARANA_SYMBOL '-'
+#define GUARANA_COLOR Color::BLUE
+
+#define NIGHTSHADE_BERRIES_STRENGTH 99
+#define NIGHTSHADE_BERRIES_SYMBOL '/'
+#define NIGHTSHADE_BERRIES_COLOR Color::BLUE
+
+#define SOSNOWSKY_HOGWEED_STRENGTH 10
+#define SOSNOWSKY_HOGWEED_SYMBOL '#'
+#define SOSNOWSKY_HOGWEED_COLOR Color::BLUE
+
+#define HUMAN_STRENGTH 5
+#define HUMAN_INITIATIVE 4
+#define HUMAN_SYMBOL 'H'
+#define HUMAN_COLOR Color::PURPLE
+
+// World settings
+#define MAP_WIDTH 30
+#define MAP_HEIGHT 25
+#define BOARD_START_X 1
+#define BOARD_START_Y 2
+#define PLANT_SPREAD_CHANCE 3
+
+// If organisms randomly generated
+
+#define WOLF_COUNT 3
+#define SHEEP_COUNT 3
+#define FOX_COUNT 3
+#define TURTLE_COUNT 3
+#define ANTELOPE_COUNT 3
+#define GRASS_COUNT 3
+#define MILKWEED_COUNT 3
+#define GUARANA_COUNT 3
+#define NIGHTSHADE_BERRIES_COUNT 3
+#define SOSNOWSKY_HOGWEED_COUNT 3
+#define HUMAN_COUNT 1
+
+#endif
