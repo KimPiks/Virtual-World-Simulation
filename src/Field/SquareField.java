@@ -4,8 +4,8 @@ import javax.swing.*;
 
 public class SquareField extends Field {
 
-    public SquareField(int x, int y, int size) {
-        super(x, y, size);
+    public SquareField(int fieldNumber, int x, int y, int size) {
+        super(fieldNumber, x, y, size);
     }
 
     @Override

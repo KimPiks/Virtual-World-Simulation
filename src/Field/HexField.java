@@ -4,8 +4,8 @@ import javax.swing.*;
 
 public class HexField extends Field {
 
-    public HexField(int x, int y, int size) {
-        super(x, y, size);
+    public HexField(int fieldNumber, int x, int y, int size) {
+        super(fieldNumber, x, y, size);
     }
 
     @Override
