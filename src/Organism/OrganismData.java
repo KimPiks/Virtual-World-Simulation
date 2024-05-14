@@ -8,12 +8,15 @@ public class OrganismData {
     private final int initiative;
     private final String iconPath;
 
+    private final int parent1Id;
+    private final int parent2Id;
+
     private int strength;
     private int age;
     private boolean born;
     private boolean alive;
 
-    public OrganismData(int id, int initiative, int strength, String iconPath) {
+    public OrganismData(int id, int initiative, int strength, String iconPath, int parent1Id, int parent2Id) {
         this.id = id;
         this.initiative = initiative;
         this.strength = strength;
@@ -21,6 +24,8 @@ public class OrganismData {
         this.born = false;
         this.alive = true;
         this.iconPath = iconPath;
+        this.parent1Id = parent1Id;
+        this.parent2Id = parent2Id;
     }
 
     public int getId() {
@@ -65,5 +70,13 @@ public class OrganismData {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
+    }
+
+    public int getParent1Id() {
+        return this.parent1Id;
+    }
+
+    public int getParent2Id() {
+        return this.parent2Id;
     }
 }

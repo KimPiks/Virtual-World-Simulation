@@ -11,7 +11,7 @@ import World.World;
 public class NightshadeBerries extends Plant {
 
     public NightshadeBerries(World world, Field field) {
-        super(new OrganismData(world.getNextOrganismId(), Settings.NIGHTSHADE_BERRIES_INITIATIVE, Settings.NIGHTSHADE_BERRIES_STRENGTH, Settings.NIGHTSHADE_BERRIES_IMAGE), world, field);
+        super(new OrganismData(world.getNextOrganismId(), Settings.NIGHTSHADE_BERRIES_INITIATIVE, Settings.NIGHTSHADE_BERRIES_STRENGTH, Settings.NIGHTSHADE_BERRIES_IMAGE, -1, -1), world, field);
     }
 
     @Override
@@ -22,6 +22,7 @@ public class NightshadeBerries extends Plant {
     @Override
     public void collision(Organism attacker) {
         if (attacker.isAnimal()) {
+            this.world.addLog(this.getType() + "(" + this.getCurrentField().getNumber() + ") killed " + attacker.getType());
             attacker.getData().setAlive(false);
         }
     }
@@ -35,7 +36,7 @@ public class NightshadeBerries extends Plant {
     public void reproduce(Field field) {
         Organism nightshadeBerries = new NightshadeBerries(this.world, field);
         this.world.addOrganism(nightshadeBerries);
-        System.out.println(this.getType() + " reproduced (" + field.getNumber() + ")");
+        this.world.addLog(this.getType() + " reproduced (" + field.getNumber() + ")");
     }
 
 }

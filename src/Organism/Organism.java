@@ -32,6 +32,6 @@ public abstract class Organism {
     }
 
     public abstract void action();
-    public abstract void collision(Organism attacker);
+    public abstract void collision(Organism organism);
     public abstract String getType();
 }

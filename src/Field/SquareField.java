@@ -1,11 +1,13 @@
 package Field;
 
+import IconManager.IconManager;
+
 import javax.swing.*;
 
 public class SquareField extends Field {
 
-    public SquareField(int fieldNumber, int x, int y, int size) {
-        super(fieldNumber, x, y, size);
+    public SquareField(int fieldNumber, int x, int y, int size, IconManager iconManager) {
+        super(fieldNumber, x, y, size, iconManager);
     }
 
     @Override
@@ -15,6 +17,10 @@ public class SquareField extends Field {
         this.button.setFocusPainted(false);
         this.button.setContentAreaFilled(false);
         frame.add(this.button);
+
+        // Set font size and field number
+        button.setFont(button.getFont().deriveFont(7f));
+        button.setText("" + this.getNumber());
     }
 
 }

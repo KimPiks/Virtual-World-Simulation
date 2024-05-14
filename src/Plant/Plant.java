@@ -20,18 +20,14 @@ public abstract class Plant extends Organism {
 
         if (spreadChance >= Settings.PLANT_REPRODUCE_CHANCE) return;
 
-        // Get free neighbour field
         Field field = this.world.getFreeNeighbourField(this.currentField);
-        // Plant
         if (field == null) return;
 
         this.reproduce(field);
     }
 
     @Override
-    public void collision(Organism attacker) {
-        System.out.println("Collision");
-    }
+    public void collision(Organism organism) {}
 
     public abstract void reproduce(Field field);
 

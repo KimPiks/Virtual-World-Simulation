@@ -1,5 +1,6 @@
 package Field;
 
+import IconManager.IconManager;
 import Organism.Organism;
 
 import javax.imageio.ImageIO;
@@ -18,12 +19,15 @@ public abstract class Field extends JPanel {
     protected Organism organism;
     protected ArrayList<Field> neighbours = new ArrayList<>();
 
-    public Field(int fieldNumber, int x, int y, int size) {
+    private final IconManager iconManager;
+
+    public Field(int fieldNumber, int x, int y, int size, IconManager iconManager) {
         this.number = fieldNumber;
         this.x = x;
         this.y = y;
         this.size = size;
-        System.out.println("Field created at x: " + x + " y: " + y);
+
+        this.iconManager = iconManager;
     }
 
     public JButton getButton() {
@@ -39,11 +43,13 @@ public abstract class Field extends JPanel {
 
         if (organism == null) {
             button.setIcon(null);
+            button.setText("" + this.getNumber());
             return;
         }
 
         try {
-            Image image = ImageIO.read(new File(organism.getData().getIconPath())).getScaledInstance(this.size, this.size, Image.SCALE_SMOOTH);
+            Image image = this.iconManager.getIcon(organism.getData().getIconPath());
+            button.setText("");
             button.setIcon(new ImageIcon(image));
         }
         catch (Exception e) {

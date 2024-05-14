@@ -9,7 +9,7 @@ import Settings.Settings;
 public class Milkweed extends Plant {
 
     public Milkweed(World world, Field field) {
-        super(new OrganismData(world.getNextOrganismId(), Settings.MILKWEED_INITIATIVE, Settings.MILKWEED_STRENGTH, Settings.MILKWEED_IMAGE), world, field);
+        super(new OrganismData(world.getNextOrganismId(), Settings.MILKWEED_INITIATIVE, Settings.MILKWEED_STRENGTH, Settings.MILKWEED_IMAGE, -1, -1), world, field);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class Milkweed extends Plant {
     public void reproduce(Field field) {
         Organism milkweed = new Milkweed(this.world, field);
         this.world.addOrganism(milkweed);
-        System.out.println(this.getType() + " reproduced (" + field.getNumber() + ")");
+        this.world.addLog(this.getType() + " reproduced (" + field.getNumber() + ")");
     }
 }

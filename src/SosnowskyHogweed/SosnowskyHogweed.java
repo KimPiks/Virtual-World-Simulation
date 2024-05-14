@@ -11,15 +11,15 @@ import World.World;
 public class SosnowskyHogweed extends Plant {
 
     public SosnowskyHogweed(World world, Field field) {
-        super(new OrganismData(world.getNextOrganismId(), Settings.SOSNOWSKY_HOGWEED_INITIATIVE, Settings.SOSNOWSKY_HOGWEED_STRENGTH, Settings.SOSNOWSKY_HOGWEED_IMAGE), world, field);
+        super(new OrganismData(world.getNextOrganismId(), Settings.SOSNOWSKY_HOGWEED_INITIATIVE, Settings.SOSNOWSKY_HOGWEED_STRENGTH, Settings.SOSNOWSKY_HOGWEED_IMAGE, -1, -1), world, field);
     }
 
     @Override
     public void action() {
         for (Field field : this.currentField.getNeighbours()) {
-            if (field.getOrganism() != null && field.getOrganism().isAnimal()) {
+            if (field.getOrganism() != null && field.getOrganism().isAnimal() && field.getOrganism().getData().isAlive() && field.getOrganism().getData().isBorn()) {
                 field.getOrganism().getData().setAlive(false);
-                System.out.println(this.getType() + " killed " + field.getOrganism().getType());
+                this.world.addLog(this.getType() + " killed " + field.getOrganism().getType());
             }
         }
 
@@ -42,7 +42,7 @@ public class SosnowskyHogweed extends Plant {
     public void reproduce(Field field) {
         Organism sosnowskyHogweed = new SosnowskyHogweed(this.world, field);
         this.world.addOrganism(sosnowskyHogweed);
-        System.out.println(this.getType() + " reproduced (" + field.getNumber() + ")");
+        this.world.addLog(this.getType() + " reproduced (" + field.getNumber() + ")");
     }
 
 }
