@@ -1,7 +1,9 @@
 package World;
 
 import Field.Field;
+import Human.*;
 import Organism.Organism;
+import Settings.Settings;
 import Window.Window;
 import Logging.Logging;
 
@@ -79,6 +81,14 @@ public abstract class World {
 
         for (int i = 0; i < this.organisms.size(); i++) {
             if (!this.organisms.get(i).getData().isAlive()) {
+                if (this.organisms.get(i).getType().equals("Human")) {
+                    Human human = (Human) this.organisms.get(i);
+                    if (human.getAbilityDuration() > 0) {
+                        human.getData().setAlive(true);
+                        continue;
+                    }
+                }
+
                 toRemove.add(this.organisms.get(i));
             }
         }
@@ -94,12 +104,48 @@ public abstract class World {
         }
     }
 
+    private void handleHumanAbility() {
+        Human human = this.getHuman();
+        if (human == null) {
+            this.window.removeHumanAbilityComponents();
+            return;
+        }
+        this.window.setHumanAbilityDurationLabel(human.getAbilityDuration());
+        if (human.getAbilityDuration() == 0) {
+            this.window.setHumanAbilityCooldownLabel(human.getAbilityCooldown());
+        }
+
+        if (human.getAbilityDuration() > 0) {
+            human.setAbilityDuration(human.getAbilityDuration() - 1);
+        }
+        if (human.getAbilityCooldown() > 0) {
+            human.setAbilityCooldown(human.getAbilityCooldown() - 1);
+        }
+    }
+
+    private Human getHuman() {
+        for (Organism organism : this.organisms) {
+            if (organism.getType().equals("Human")) {
+                return (Human) organism;
+            }
+        }
+        return null;
+    }
+
+    private void increaseOrganismsAge() {
+        for (Organism organism : this.organisms) {
+            organism.getData().setAge(organism.getData().getAge() + 1);
+        }
+    }
+
     private void makeTurn() {
         this.sortOrganisms();
         this.bornAllOrganisms();
         this.handleDay();
         this.handleActionAndCollision();
         this.removeDeadOrganisms();
+        this.handleHumanAbility();
+        this.increaseOrganismsAge();
 
         this.logging.showLogs();
     }
@@ -114,13 +160,63 @@ public abstract class World {
     }
 
     public void keyAction(int keyCode) {
-        if (keyCode == 32) {
+        if (!this.isHumanAlive() && keyCode == 32) {
             this.makeTurn();
+        } else if (this.isHumanAlive()) {
+            Human human = this.getHuman();
+
+            if (keyCode == 87 && this.getWorldSettings().worldType() == WorldType.RECTANGULAR && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
+                this.setHumanDirection(MoveDirection.Up);
+            } else if (keyCode == 83 && this.getWorldSettings().worldType() == WorldType.RECTANGULAR && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0)) {
+                this.setHumanDirection(MoveDirection.Down);
+            } else if (keyCode == 65 && (human.getCurrentField().getNumber() - this.getWorldSettings().height() > 0)) {
+                this.setHumanDirection(MoveDirection.Left);
+            } else if (keyCode == 68 && (human.getCurrentField().getNumber() + this.getWorldSettings().height() <= this.getWorldSettings().width() * this.getWorldSettings().height())) {
+                this.setHumanDirection(MoveDirection.Right);
+            } else if (keyCode == 81 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
+                this.setHumanDirection(MoveDirection.UP_LEFT);
+            }  else if (keyCode == 69 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() + this.getWorldSettings().height() <= this.getWorldSettings().width() * this.getWorldSettings().height()) && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
+                this.setHumanDirection(MoveDirection.UP_RIGHT);
+            } else if (keyCode == 90 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0) && (human.getCurrentField().getNumber() - this.getWorldSettings().height() > 0)) {
+                this.setHumanDirection(MoveDirection.DOWN_LEFT);
+            }  else if (keyCode == 67 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0)) {
+                this.setHumanDirection(MoveDirection.DOWN_RIGHT);
+            } else if (keyCode == 80 && human.getAbilityCooldown() == 0) {
+                human.setAbilityDuration(Settings.HUMAN_ABILITY_DURATION);
+                human.setAbilityCooldown(Settings.HUMAN_ABILITY_COOLDOWN);
+                this.handleHumanAbility();
+                return;
+            } else {
+                return;
+            }
+
+            this.makeTurn();
+        }
+    }
+
+    private boolean isHumanAlive() {
+        for (Organism organism : this.organisms) {
+            if (organism.getType().equals("Human") && organism.getData().isAlive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void setHumanDirection(MoveDirection moveDirection) {
+        for (Organism organism : this.organisms) {
+            if (organism.getType().equals("Human")) {
+                ((Human) organism).setMoveDirection(moveDirection);
+            }
         }
     }
 
     public WorldSettings getWorldSettings() {
         return this.worldSettings;
+    }
+
+    public Field getField(int fieldNumber) {
+        return this.window.getFields().get(fieldNumber - 1);
     }
 
     public Field getNeighbourField(Field field) {

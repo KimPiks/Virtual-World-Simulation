@@ -2,6 +2,7 @@ import Field.Field;
 import Fox.Fox;
 import Grass.Grass;
 import Guarana.Guarana;
+import Human.Human;
 import Logging.Logging;
 import Milkweed.Milkweed;
 import NightshadeBerries.NightshadeBerries;
@@ -10,7 +11,6 @@ import Sheep.Sheep;
 import SosnowskyHogweed.SosnowskyHogweed;
 import Turtle.Turtle;
 import Window.Window;
-import Wolf.Wolf;
 import Antelope.Antelope;
 import World.*;
 import World.WorldSettings;
@@ -21,6 +21,7 @@ public class Main {
     public static void main(String[] args) {
         Window window = new Window();
         WorldSettings worldSettings = new WorldSettings(WorldType.HEXAGONAL, 10, 10);
+        //WorldSettings worldSettings = window.askForWorldSetting();
 
         World world = World.initializeWorld(worldSettings, window);
         world.placeFields();
@@ -78,5 +79,9 @@ public class Main {
         Organism antelope1 = new Antelope(world, window.getFields().get(60), -1, -1);
         antelope1.getData().setBorn(true);
         world.addOrganism(antelope1);
+
+        Organism human = new Human(world, window.getFields().get(75), -1, -1);
+        human.getData().setBorn(true);
+        world.addOrganism(human);
     }
 }

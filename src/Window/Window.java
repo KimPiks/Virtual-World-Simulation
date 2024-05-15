@@ -16,6 +16,8 @@ public class Window extends JPanel {
 
     private final JFrame frame;
     private final JLabel dayLabel;
+    private final JLabel humanAbilityDurationLabel;
+    private final JLabel humanAbilityCooldownLabel;
 
     private World world;
 
@@ -26,7 +28,16 @@ public class Window extends JPanel {
 
         this.dayLabel = new JLabel("Day: 0");
         this.dayLabel.setBounds(WINDOW_OFFSET / 4, WINDOW_OFFSET / 4, 100, 20);
+
+        this.humanAbilityDurationLabel = new JLabel("Ability duration: 0");
+        this.humanAbilityDurationLabel.setBounds(WINDOW_OFFSET / 4 + 140, WINDOW_OFFSET / 4, 150, 20);
+
+        this.humanAbilityCooldownLabel = new JLabel("Ability cooldown: 0");
+        this.humanAbilityCooldownLabel.setBounds(WINDOW_OFFSET / 4 + 350, WINDOW_OFFSET / 4, 150, 20);
+
         this.frame.add(this.dayLabel);
+        this.frame.add(this.humanAbilityDurationLabel);
+        this.frame.add(this.humanAbilityCooldownLabel);
     }
 
     public void addField(Field field) {
@@ -52,6 +63,7 @@ public class Window extends JPanel {
         ArrayList<Field> fields = this.getFields();
         for (Field field : fields) {
             field.showField(this.frame);
+            field.addActionListener();
         }
         this.frame.setLayout(null);
     }
@@ -124,8 +136,18 @@ public class Window extends JPanel {
     public WorldSettings askForWorldSetting() {
         String[] options = {"Hexagonal", "Rectangular"};
         int worldType = JOptionPane.showOptionDialog(frame, "Choose the world type", "World type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        int width = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter the width of the world"));
-        int height = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter the height of the world"));
+        if (worldType == -1) System.exit(0);
+
+        String widthStr = JOptionPane.showInputDialog(frame, "Enter the width of the world");
+        if (widthStr == null || widthStr.isEmpty()) System.exit(0);
+        int width = Integer.parseInt(widthStr);
+        if (width < 1) System.exit(0);
+
+        String heightStr = JOptionPane.showInputDialog(frame, "Enter the height of the world");
+        if (heightStr == null || heightStr.isEmpty()) System.exit(0);
+        int height = Integer.parseInt(heightStr);
+        if (height < 1) System.exit(0);
+
         return new WorldSettings(WorldType.values()[worldType], width, height);
     }
 
@@ -143,6 +165,19 @@ public class Window extends JPanel {
 
     public void setDayLabel(int day) {
         this.dayLabel.setText("Day: " + day);
+    }
+
+    public void setHumanAbilityDurationLabel(int duration) {
+        this.humanAbilityDurationLabel.setText("Ability duration: " + duration);
+    }
+
+    public void setHumanAbilityCooldownLabel(int cooldown) {
+        this.humanAbilityCooldownLabel.setText("Ability cooldown: " + cooldown);
+    }
+
+    public void removeHumanAbilityComponents() {
+        this.humanAbilityDurationLabel.setText("");
+        this.humanAbilityCooldownLabel.setText("");
     }
 
     public void addKeyListener() {

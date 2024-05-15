@@ -22,5 +22,4 @@ public class SquareField extends Field {
         button.setFont(button.getFont().deriveFont(7f));
         button.setText("" + this.getNumber());
     }
-
 }

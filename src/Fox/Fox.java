@@ -16,6 +16,10 @@ public class Fox extends Animal {
     @Override
     public void action() {
         Field field = this.world.getFreeNeighbourField(this.currentField);
+        if (field == null) {
+            super.action();
+            return;
+        }
 
         this.lastField = this.currentField;
         this.currentField.setOrganism(null);

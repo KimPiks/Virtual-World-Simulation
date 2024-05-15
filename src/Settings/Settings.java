@@ -4,6 +4,9 @@ public class Settings {
 
     // Value in percent
     public static final int PLANT_REPRODUCE_CHANCE = 3;
+    // Values in turns
+    public static final int HUMAN_ABILITY_DURATION = 5;
+    public static final int HUMAN_ABILITY_COOLDOWN = 10;
 
     public static final int MILKWEED_STRENGTH = 0;
     public static final int MILKWEED_INITIATIVE = 0;
