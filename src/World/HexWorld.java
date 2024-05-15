@@ -24,7 +24,7 @@ public class HexWorld extends World {
                 int x = this.window.WINDOW_OFFSET + startX + i * this.window.FIELD_SIZE;
                 int y = this.window.WINDOW_OFFSET + (int)((double)j * (double)this.window.FIELD_SIZE / 20 * 17);
 
-                Field field = new HexField(fieldNumber++, x, y, this.window.FIELD_SIZE, this.iconManager);
+                Field field = new HexField(fieldNumber++, x, y, this.window.FIELD_SIZE, this.iconManager, this);
                 this.window.addField(field);
             }
         }

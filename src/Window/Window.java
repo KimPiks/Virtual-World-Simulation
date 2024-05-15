@@ -63,7 +63,7 @@ public class Window extends JPanel {
         ArrayList<Field> fields = this.getFields();
         for (Field field : fields) {
             field.showField(this.frame);
-            field.addActionListener();
+            field.addActionListener(this.frame);
         }
         this.frame.setLayout(null);
     }

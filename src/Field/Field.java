@@ -2,6 +2,8 @@ package Field;
 
 import IconManager.IconManager;
 import Organism.Organism;
+import OrganismManager.*;
+import World.World;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,14 +22,16 @@ public abstract class Field extends JPanel {
     protected ArrayList<Field> neighbours = new ArrayList<>();
 
     private final IconManager iconManager;
+    private final World world;
 
-    public Field(int fieldNumber, int x, int y, int size, IconManager iconManager) {
+    public Field(int fieldNumber, int x, int y, int size, IconManager iconManager, World world) {
         this.number = fieldNumber;
         this.x = x;
         this.y = y;
         this.size = size;
 
         this.iconManager = iconManager;
+        this.world = world;
     }
 
     public JButton getButton() {
@@ -58,11 +62,20 @@ public abstract class Field extends JPanel {
     }
 
 
-    public void addActionListener() {
+    public void addActionListener(JFrame frame) {
         this.button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Field " + number + " clicked");
+                if (organism != null) return;
+
+                OrganismType organismType = OrganismManager.openOrganismSelection(frame);
+                if (organismType == null) return;
+
+                Organism organism = OrganismManager.createOrganism(organismType, world, Field.this);
+                if (organism == null) return;
+
+                Field.this.setOrganism(organism);
+                world.addOrganism(organism);
             }
         });
     }

@@ -1,13 +1,14 @@
 package Field;
 
 import IconManager.IconManager;
+import World.World;
 
 import javax.swing.*;
 
 public class SquareField extends Field {
 
-    public SquareField(int fieldNumber, int x, int y, int size, IconManager iconManager) {
-        super(fieldNumber, x, y, size, iconManager);
+    public SquareField(int fieldNumber, int x, int y, int size, IconManager iconManager, World world) {
+        super(fieldNumber, x, y, size, iconManager, world);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class RectangleWorld extends World {
                 int x = this.window.WINDOW_OFFSET + (i-1) * this.window.FIELD_SIZE;
                 int y = this.window.WINDOW_OFFSET + (j-1) * this.window.FIELD_SIZE;
 
-                Field field = new SquareField(fieldNumber++, x, y, this.window.FIELD_SIZE, this.iconManager);
+                Field field = new SquareField(fieldNumber++, x, y, this.window.FIELD_SIZE, this.iconManager, this);
                 this.window.addField(field);
             }
         }
