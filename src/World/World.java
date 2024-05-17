@@ -3,6 +3,7 @@ package World;
 import Field.Field;
 import Human.*;
 import Organism.Organism;
+import Saving.Saving;
 import Settings.Settings;
 import Window.Window;
 import Logging.Logging;
@@ -19,26 +20,53 @@ public abstract class World {
     private int nextOrganismId;
     private int day;
 
+    private String worldId;
+
     private final ArrayList<Organism> organisms = new ArrayList<Organism>();
 
     private final Logging logging;
+    private final Saving saving;
 
     public World(Window window, WorldSettings worldSettings) {
         this.window = window;
         this.worldSettings = worldSettings;
         this.logging = new Logging();
+        this.saving = new Saving(window, window.getFrame());
+        this.worldId = java.time.LocalDateTime.now().toString().replace(":", "-").replace("T", "-").replace(".", "-") + "-" + (int) (Math.random() * 10000);
+
+        this.saving.setWorld(this);
     }
 
     public int getNextOrganismId() {
         return ++this.nextOrganismId;
     }
 
+    public void setNextOrganismId(int nextOrganismId) {
+        this.nextOrganismId = nextOrganismId;
+    }
+
+    public void addOrganisms(ArrayList<Organism> organisms) {
+        this.organisms.addAll(organisms);
+    }
+
     public int getDay() {
         return this.day;
     }
 
+    public void setDay(int day) {
+        this.day = day;
+    }
+
     public void incrementDay() {
         this.day++;
+    }
+
+    public String getWorldId() {
+        return this.worldId;
+    }
+
+    public void setWorldId(String worldId) {
+        this.worldId = worldId;
     }
 
     private void handleDay() {
@@ -74,6 +102,10 @@ public abstract class World {
             organism.getData().setBorn(true);
             organism.getCurrentField().setOrganism(organism);
         }
+    }
+
+    public ArrayList<Organism> getOrganisms() {
+        return this.organisms;
     }
 
     private void removeDeadOrganisms() {
@@ -123,7 +155,7 @@ public abstract class World {
         }
     }
 
-    private Human getHuman() {
+    public Human getHuman() {
         for (Organism organism : this.organisms) {
             if (organism.getType().equals("Human")) {
                 return (Human) organism;
@@ -160,6 +192,14 @@ public abstract class World {
     }
 
     public void keyAction(int keyCode) {
+        if (keyCode == 79) {
+            this.saving.save();
+            return;
+        } else if (keyCode == 76) {
+            this.saving.load("2024-05-17-15-25-41-444720841-91-5");
+            return;
+        }
+
         if (!this.isHumanAlive() && keyCode == 32) {
             this.makeTurn();
         } else if (this.isHumanAlive()) {

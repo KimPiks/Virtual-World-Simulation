@@ -151,6 +151,19 @@ public class Window extends JPanel {
         return new WorldSettings(WorldType.values()[worldType], width, height);
     }
 
+    public MenuOption askForMenuOption() {
+        String[] options = {"New simulation", "Load simulation", "Exit"};
+        int option = JOptionPane.showOptionDialog(frame, "Choose an option", "Virtual World Simulation Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (option == -1 || option == 2) System.exit(0);
+        return MenuOption.values()[option];
+    }
+
+    public String askForSaveFileName() {
+        String fileName = JOptionPane.showInputDialog(frame, "Enter the name of the file");
+        if (fileName == null || fileName.isEmpty()) System.exit(0);
+        return fileName;
+    }
+
     public void setWindowSize(WorldType worldType, int worldWidth, int worldHeight) {
         if (worldType == WorldType.HEXAGONAL) {
             this.frame.setSize((worldWidth + worldHeight / 3 * 2) * FIELD_SIZE + WINDOW_OFFSET * 2, worldHeight * FIELD_SIZE + WINDOW_OFFSET * 3);
@@ -178,6 +191,10 @@ public class Window extends JPanel {
     public void removeHumanAbilityComponents() {
         this.humanAbilityDurationLabel.setText("");
         this.humanAbilityCooldownLabel.setText("");
+    }
+
+    public JFrame getFrame() {
+        return this.frame;
     }
 
     public void addKeyListener() {

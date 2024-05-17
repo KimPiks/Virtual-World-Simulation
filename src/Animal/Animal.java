@@ -34,6 +34,14 @@ public abstract class Animal extends Organism {
         }
     }
 
+    public Field getLastField() {
+        return this.lastField;
+    }
+
+    public void setLastField(Field field) {
+        this.lastField = field;
+    }
+
     public void moveOrganismToPreviousField() {
         Organism otherOrganism = this.world.getOrganismAtField(this.currentField, this);
         if (otherOrganism != null) {

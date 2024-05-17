@@ -4,12 +4,12 @@ package Organism;
 
 public class OrganismData {
 
-    private final int id;
+    private int id;
     private final int initiative;
     private final String iconPath;
 
-    private final int parent1Id;
-    private final int parent2Id;
+    private int parent1Id;
+    private int parent2Id;
 
     private int strength;
     private int age;
@@ -30,6 +30,10 @@ public class OrganismData {
 
     public int getId() {
         return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getInitiative() {
@@ -78,5 +82,13 @@ public class OrganismData {
 
     public int getParent2Id() {
         return this.parent2Id;
+    }
+
+    public void setParent1Id(int parent1Id) {
+        this.parent1Id = parent1Id;
+    }
+
+    public void setParent2Id(int parent2Id) {
+        this.parent2Id = parent2Id;
     }
 }
