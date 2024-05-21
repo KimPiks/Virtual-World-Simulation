@@ -92,9 +92,6 @@ public class Saving {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        for (String line : read) {
-            System.out.println(line);
-        }
 
         String id = read[0];
         String worldType = read[1];
@@ -168,6 +165,7 @@ public class Saving {
         this.world.setNextOrganismId(maxId+1);
         this.world.addOrganisms(organisms);
 
+        this.world.handleButtons();
         this.window.setDayLabel(this.world.getDay());
         this.window.setHumanAbilityDurationLabel(abilityDuration+1);
         if (abilityDuration == 0) {

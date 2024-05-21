@@ -8,6 +8,7 @@ import Settings.Settings;
 import Window.Window;
 import Logging.Logging;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,18 +20,16 @@ public abstract class World {
 
     private int nextOrganismId;
     private int day;
-
     private String worldId;
 
     private final ArrayList<Organism> organisms = new ArrayList<Organism>();
-
     private final Logging logging;
     private final Saving saving;
 
     public World(Window window, WorldSettings worldSettings) {
         this.window = window;
         this.worldSettings = worldSettings;
-        this.logging = new Logging();
+        this.logging = new Logging(window.getLoggingPanel());
         this.saving = new Saving(window, window.getFrame());
         this.worldId = java.time.LocalDateTime.now().toString().replace(":", "-").replace("T", "-").replace(".", "-") + "-" + (int) (Math.random() * 10000);
 
@@ -136,7 +135,7 @@ public abstract class World {
         }
     }
 
-    private void handleHumanAbility() {
+    public void handleHumanAbility() {
         Human human = this.getHuman();
         if (human == null) {
             this.window.removeHumanAbilityComponents();
@@ -155,6 +154,10 @@ public abstract class World {
         }
     }
 
+    public Saving getSaving() {
+        return this.saving;
+    }
+
     public Human getHuman() {
         for (Organism organism : this.organisms) {
             if (organism.getType().equals("Human")) {
@@ -170,7 +173,24 @@ public abstract class World {
         }
     }
 
-    private void makeTurn() {
+    public void handleButtons() {
+        ArrayList<JButton> buttons = window.getButtons();
+        for (JButton button : buttons) {
+            switch (button.getText()) {
+                case "New turn":
+                    button.setEnabled(!this.isHumanAlive());
+                    break;
+                case "Special ability":
+                    button.setEnabled(this.isHumanAlive() && ((Human) this.getHuman()).getAbilityCooldown() == 0);
+                    break;
+                case "Move up left": case "Move up right": case "Move down left": case "Move down right": case "Move left": case "Move right": case "Move up": case "Move down":
+                    button.setEnabled(this.isHumanAlive());
+                    break;
+            }
+        }
+    }
+
+    public void makeTurn() {
         this.sortOrganisms();
         this.bornAllOrganisms();
         this.handleDay();
@@ -178,6 +198,7 @@ public abstract class World {
         this.removeDeadOrganisms();
         this.handleHumanAbility();
         this.increaseOrganismsAge();
+        this.handleButtons();
 
         this.logging.showLogs();
     }
@@ -191,46 +212,103 @@ public abstract class World {
         return null;
     }
 
+    public void playerMoveLeft() {
+        Human human = this.getHuman();
+        if ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().width() != 0) {
+            this.setHumanDirection(MoveDirection.LEFT);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveRight() {
+        Human human = this.getHuman();
+        if (human.getCurrentField().getNumber() % this.getWorldSettings().width() != 0) {
+            this.setHumanDirection(MoveDirection.RIGHT);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveUp() {
+        Human human = this.getHuman();
+        if (this.worldSettings.worldType() == WorldType.RECTANGULAR && human.getCurrentField().getNumber() - this.getWorldSettings().width() > 0) {
+            this.setHumanDirection(MoveDirection.UP);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveDown() {
+        Human human = this.getHuman();
+        if (this.worldSettings.worldType() == WorldType.RECTANGULAR && human.getCurrentField().getNumber() + this.getWorldSettings().width() <= this.getWorldSettings().width() * this.getWorldSettings().height()) {
+            this.setHumanDirection(MoveDirection.DOWN);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveUpLeft() {
+        Human human = this.getHuman();
+        if (this.getWorldSettings().worldType() == WorldType.HEXAGONAL && ((human.getCurrentField().getNumber() - this.getWorldSettings().width()) > 0)) {
+            this.setHumanDirection(MoveDirection.UP_LEFT);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveUpRight() {
+        Human human = this.getHuman();
+        if (this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() - this.getWorldSettings().width() > 0 && (human.getCurrentField().getNumber() % this.getWorldSettings().width() != 0))) {
+            this.setHumanDirection(MoveDirection.UP_RIGHT);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveDownLeft() {
+        Human human = this.getHuman();
+        if (this.getWorldSettings().worldType() == WorldType.HEXAGONAL && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().width() != 0) && (human.getCurrentField().getNumber() + this.getWorldSettings().width() <= this.getWorldSettings().width() * this.getWorldSettings().height())) {
+            this.setHumanDirection(MoveDirection.DOWN_LEFT);
+            this.makeTurn();
+        }
+    }
+
+    public void playerMoveDownRight() {
+        Human human = this.getHuman();
+        if (this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() + this.getWorldSettings().width()) <= this.getWorldSettings().width() * this.getWorldSettings().height()) {
+            this.setHumanDirection(MoveDirection.DOWN_RIGHT);
+            this.makeTurn();
+        }
+    }
+
     public void keyAction(int keyCode) {
-        if (keyCode == 79) {
+        if (keyCode == Settings.SAVE_KEYCODE) {
             this.saving.save();
-            return;
-        } else if (keyCode == 76) {
-            this.saving.load("2024-05-17-15-25-41-444720841-91-5");
             return;
         }
 
-        if (!this.isHumanAlive() && keyCode == 32) {
+        if (!this.isHumanAlive() && keyCode == Settings.NEW_TURN_KEYCODE) {
             this.makeTurn();
         } else if (this.isHumanAlive()) {
             Human human = this.getHuman();
 
-            if (keyCode == 87 && this.getWorldSettings().worldType() == WorldType.RECTANGULAR && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
-                this.setHumanDirection(MoveDirection.Up);
-            } else if (keyCode == 83 && this.getWorldSettings().worldType() == WorldType.RECTANGULAR && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0)) {
-                this.setHumanDirection(MoveDirection.Down);
-            } else if (keyCode == 65 && (human.getCurrentField().getNumber() - this.getWorldSettings().height() > 0)) {
-                this.setHumanDirection(MoveDirection.Left);
-            } else if (keyCode == 68 && (human.getCurrentField().getNumber() + this.getWorldSettings().height() <= this.getWorldSettings().width() * this.getWorldSettings().height())) {
-                this.setHumanDirection(MoveDirection.Right);
-            } else if (keyCode == 81 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
-                this.setHumanDirection(MoveDirection.UP_LEFT);
-            }  else if (keyCode == 69 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() + this.getWorldSettings().height() <= this.getWorldSettings().width() * this.getWorldSettings().height()) && ((human.getCurrentField().getNumber() - 1) % this.getWorldSettings().height() != 0)) {
-                this.setHumanDirection(MoveDirection.UP_RIGHT);
-            } else if (keyCode == 90 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0) && (human.getCurrentField().getNumber() - this.getWorldSettings().height() > 0)) {
-                this.setHumanDirection(MoveDirection.DOWN_LEFT);
-            }  else if (keyCode == 67 && this.getWorldSettings().worldType() == WorldType.HEXAGONAL && (human.getCurrentField().getNumber() % this.getWorldSettings().height() != 0)) {
-                this.setHumanDirection(MoveDirection.DOWN_RIGHT);
-            } else if (keyCode == 80 && human.getAbilityCooldown() == 0) {
+            if (keyCode == Settings.MOVE_UP_KEYCODE) {
+                this.playerMoveUp();
+            } else if (keyCode == Settings.MOVE_DOWN_KEYCODE) {
+                this.playerMoveDown();
+            } else if (keyCode == Settings.MOVE_LEFT_KEYCODE) {
+                this.playerMoveLeft();
+            } else if (keyCode == Settings.MOVE_RIGHT_KEYCODE) {
+                this.playerMoveRight();
+            } else if (keyCode == Settings.MOVE_UP_LEFT_KEYCODE) {
+                this.playerMoveUpLeft();
+            } else if (keyCode == Settings.MOVE_UP_RIGHT_KEYCODE) {
+                this.playerMoveUpRight();
+            } else if (keyCode == Settings.MOVE_DOWN_LEFT_KEYCODE) {
+                this.playerMoveDownLeft();
+            }  else if (keyCode == Settings.MOVE_DOWN_RIGHT_KEYCODE) {
+                this.playerMoveDownRight();
+            } else if (keyCode == Settings.ABILITY_KEYCODE && human.getAbilityCooldown() == 0) {
                 human.setAbilityDuration(Settings.HUMAN_ABILITY_DURATION);
                 human.setAbilityCooldown(Settings.HUMAN_ABILITY_COOLDOWN);
                 this.handleHumanAbility();
-                return;
-            } else {
-                return;
+                this.handleButtons();
             }
-
-            this.makeTurn();
         }
     }
 

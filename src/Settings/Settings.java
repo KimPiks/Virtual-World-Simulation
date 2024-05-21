@@ -8,6 +8,19 @@ public class Settings {
     public static final int HUMAN_ABILITY_DURATION = 5;
     public static final int HUMAN_ABILITY_COOLDOWN = 10;
 
+    public static final int SAVE_KEYCODE = 79; // O
+    public static final int NEW_TURN_KEYCODE = 32; // Space
+    public static final int MOVE_LEFT_KEYCODE = 65; // A
+    public static final int MOVE_RIGHT_KEYCODE = 68; // D
+    public static final int MOVE_UP_KEYCODE = 87; // W
+    public static final int MOVE_DOWN_KEYCODE = 83; // S
+    public static final int MOVE_UP_LEFT_KEYCODE = 81; // Q
+    public static final int MOVE_UP_RIGHT_KEYCODE = 69; // E
+    public static final int MOVE_DOWN_LEFT_KEYCODE = 90; // Z
+    public static final int MOVE_DOWN_RIGHT_KEYCODE = 67; // C
+    public static final int ABILITY_KEYCODE = 80; // P
+
+
     public static final int MILKWEED_STRENGTH = 0;
     public static final int MILKWEED_INITIATIVE = 0;
     public static final String MILKWEED_IMAGE = "img/Milkweed/milkweed.png";

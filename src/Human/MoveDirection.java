@@ -1,11 +1,11 @@
 package Human;
 
 public enum MoveDirection {
-    None,
+    NONE,
 
     // Only in rectangular variant
-    Up,
-    Down,
+    UP,
+    DOWN,
 
     // Only in hex variant
     UP_LEFT,
@@ -14,6 +14,6 @@ public enum MoveDirection {
     DOWN_RIGHT,
 
     // In both variants
-    Left,
-    Right
+    LEFT,
+    RIGHT
 }

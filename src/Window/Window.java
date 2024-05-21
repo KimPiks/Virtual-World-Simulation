@@ -1,71 +1,272 @@
 package Window;
 
 import Field.Field;
-import Field.SquareField;
-import Field.HexField;
+import LayoutManagers.HexLayoutManager;
+import Settings.Settings;
 import World.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Window extends JPanel {
 
-    public final int WINDOW_OFFSET = 50;
-    public final int FIELD_SIZE = 50;
-
     private final JFrame frame;
-    private final JLabel dayLabel;
-    private final JLabel humanAbilityDurationLabel;
-    private final JLabel humanAbilityCooldownLabel;
+    private JLabel dayLabel;
+    private JLabel humanAbilityDurationLabel;
+    private JLabel humanAbilityCooldownLabel;
+
+    private final JPanel mainPanel = new JPanel();
+    private final JPanel labelsPanel = new JPanel();
+    private final JPanel panel = new JPanel();
+    private final JPanel loggingPanel = new JPanel();
+    private final JPanel buttonsPanel = new JPanel();
+    private final JPanel steeringPanel = new JPanel();
+
+    private final ArrayList<Field> fields = new ArrayList<Field>();
 
     private World world;
 
     public Window() {
         this.frame = new JFrame();
-        this.frame.setTitle("Virtual World Simulation");
-        this.frame.setResizable(false);
+        this.frame.setTitle("Virtual World Simulation Kamil Prorok 201095");
+        this.frame.setResizable(true);
 
+        this.addLabels();
+        this.addMainButtons();
+    }
+
+    private void addLabels() {
         this.dayLabel = new JLabel("Day: 0");
-        this.dayLabel.setBounds(WINDOW_OFFSET / 4, WINDOW_OFFSET / 4, 100, 20);
-
         this.humanAbilityDurationLabel = new JLabel("Ability duration: 0");
-        this.humanAbilityDurationLabel.setBounds(WINDOW_OFFSET / 4 + 140, WINDOW_OFFSET / 4, 150, 20);
-
         this.humanAbilityCooldownLabel = new JLabel("Ability cooldown: 0");
-        this.humanAbilityCooldownLabel.setBounds(WINDOW_OFFSET / 4 + 350, WINDOW_OFFSET / 4, 150, 20);
 
-        this.frame.add(this.dayLabel);
-        this.frame.add(this.humanAbilityDurationLabel);
-        this.frame.add(this.humanAbilityCooldownLabel);
+        this.labelsPanel.add(this.dayLabel);
+        this.labelsPanel.add(this.humanAbilityDurationLabel);
+        this.labelsPanel.add(this.humanAbilityCooldownLabel);
+    }
+
+    private void addMainButtons() {
+        JButton newTurnButton = new JButton("New turn");
+        newTurnButton.setEnabled(false);
+        newTurnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                world.makeTurn();
+            }
+        });
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                world.getSaving().save();
+            }
+        });
+
+        JButton specialAbility = new JButton("Special ability");
+        specialAbility.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null || world.getHuman().getAbilityCooldown() > 0) return;
+
+                world.getHuman().setAbilityDuration(Settings.HUMAN_ABILITY_DURATION);
+                world.getHuman().setAbilityCooldown(Settings.HUMAN_ABILITY_COOLDOWN);
+
+                world.handleHumanAbility();
+                specialAbility.setEnabled(false);
+            }
+        });
+
+        this.buttonsPanel.add(newTurnButton);
+        this.buttonsPanel.add(saveButton);
+        this.buttonsPanel.add(specialAbility);
+    }
+
+    public ArrayList<JButton> getButtons() {
+        ArrayList<JButton> buttons = new ArrayList<JButton>();
+        ArrayList<Component> components = new ArrayList<Component>();
+
+        components.addAll(Arrays.asList(this.buttonsPanel.getComponents()));
+        components.addAll(Arrays.asList(this.steeringPanel.getComponents()));
+
+        for (Component component : components) {
+            if (component instanceof JButton) {
+                buttons.add((JButton) component);
+            }
+        }
+        return buttons;
     }
 
     public void addField(Field field) {
-        this.frame.add(field);
+        this.panel.add(field.getButton());
+        this.fields.add(field);
     }
 
     public void setWorld(World world) {
         this.world = world;
     }
 
-    public ArrayList<Field> getFields() {
-        ArrayList<Field> fields = new ArrayList<>();
-        Component[] components = this.frame.getContentPane().getComponents();
-        for (Component c : components) {
-            if (c.getClass().equals(SquareField.class) || c.getClass().equals(HexField.class)) {
-                fields.add((Field) c);
-            }
+    public JPanel getLoggingPanel() {
+        return this.loggingPanel;
+    }
+
+    public void addPanels() {
+        this.mainPanel.setLayout(new BorderLayout());
+        this.labelsPanel.setLayout(new GridLayout(1, 3));
+        this.labelsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        this.labelsPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        this.loggingPanel.setLayout(new GridLayout(1, 1));
+        this.loggingPanel.setMaximumSize(new Dimension(200, Integer.MAX_VALUE));
+        this.loggingPanel.setPreferredSize(new Dimension(200, Integer.MAX_VALUE));
+
+        this.buttonsPanel.setLayout(new GridLayout(1, 1));
+
+        if (world.getWorldSettings().worldType() == WorldType.RECTANGULAR) {
+            this.panel.setLayout(new GridLayout(this.world.getWorldSettings().height(), this.world.getWorldSettings().width()));
+        } else {
+            this.panel.setLayout(new HexLayoutManager(this.world.getWorldSettings().width(), this.world.getWorldSettings().height()));
         }
-        return fields;
+
+        this.addSteeringPanel();
+
+        this.mainPanel.add(this.labelsPanel, BorderLayout.NORTH);
+        this.mainPanel.add(this.panel, BorderLayout.CENTER);
+        this.mainPanel.add(this.loggingPanel, BorderLayout.EAST);
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(2, 1));
+        southPanel.add(this.buttonsPanel);
+        southPanel.add(this.steeringPanel);
+
+        this.mainPanel.add(southPanel, BorderLayout.SOUTH);
+        getFrame().add(this.mainPanel);
+    }
+
+    private void addSteeringPanel() {
+        this.addCommonSteering();
+
+        if (this.world.getWorldSettings().worldType() == WorldType.HEXAGONAL) {
+            this.addHexagonalSteering();
+        } else {
+            this.addRectangularSteering();
+        }
+    }
+
+    private void addCommonSteering() {
+        JButton leftMove = new JButton("Move left");
+        JButton moveRight = new JButton("Move right");
+
+        leftMove.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveLeft();
+            }
+        });
+
+        moveRight.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveRight();
+            }
+        });
+
+        this.steeringPanel.add(leftMove);
+        this.steeringPanel.add(moveRight);
+    }
+
+    private void addRectangularSteering() {
+        JButton moveUp = new JButton("Move up");
+        JButton moveDown = new JButton("Move down");
+
+        moveUp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveUp();
+            }
+        });
+
+        moveDown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveDown();
+            }
+        });
+
+        this.steeringPanel.add(moveUp);
+        this.steeringPanel.add(moveDown);
+    }
+
+    private void addHexagonalSteering() {
+        JButton moveUpLeft = new JButton("Move up left");
+        JButton moveUpRight = new JButton("Move up right");
+        JButton moveDownLeft = new JButton("Move down left");
+        JButton moveDownRight = new JButton("Move down right");
+
+        moveUpLeft.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveUpLeft();
+            }
+        });
+
+        moveUpRight.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveUpRight();
+            }
+        });
+
+        moveDownLeft.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveDownLeft();
+            }
+        });
+
+        moveDownRight.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (world.getHuman() == null) return;
+
+                world.playerMoveDownRight();
+            }
+        });
+
+        this.steeringPanel.add(moveUpLeft);
+        this.steeringPanel.add(moveUpRight);
+        this.steeringPanel.add(moveDownLeft);
+        this.steeringPanel.add(moveDownRight);
+    }
+
+    public ArrayList<Field> getFields() {
+        return this.fields;
     }
 
     public void displayFields() {
         ArrayList<Field> fields = this.getFields();
         for (Field field : fields) {
-            field.showField(this.frame);
+            field.showField(this.panel);
             field.addActionListener(this.frame);
         }
-        this.frame.setLayout(null);
     }
 
     public void setFieldsNeighbours() {
@@ -82,23 +283,23 @@ public class Window extends JPanel {
 
     private void addRectangularNeighbours(ArrayList<Field> fields, int width, int height) {
         for (Field field : fields) {
-            // Left neighbour
-            if (field.getNumber() - height > 0 && fields.get(field.getNumber() - height - 1) != null && field.getY() == fields.get(field.getNumber() - height - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() - height - 1));
-            }
-
-            // Right neighbour
-            if (field.getNumber() + height <= width * height && fields.get(field.getNumber() + height - 1) != null && field.getY() == fields.get(field.getNumber() + height - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() + height - 1));
-            }
-
             // Up neighbour
-            if (field.getNumber() - 1 > 0 && fields.get(field.getNumber() - 1 - 1) != null && field.getY() > fields.get(field.getNumber() - 1 - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() - 1 - 1));
+            if (field.getNumber() - width > 0 && fields.get(field.getNumber() - width - 1) != null && field.getButton().getY() > fields.get(field.getNumber() - width - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() - width - 1));
             }
 
             // Down neighbour
-            if (field.getNumber() + 1 <= width * height && fields.get(field.getNumber() + 1 - 1) != null && field.getY() < fields.get(field.getNumber() + 1 - 1).getY()) {
+            if (field.getNumber() + width <= width * height && fields.get(field.getNumber() + width - 1) != null && field.getButton().getY() < fields.get(field.getNumber() + width - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() + width - 1));
+            }
+
+            // Left neighbour
+            if (field.getNumber() - 1 > 0 && fields.get(field.getNumber() - 1 - 1) != null && field.getButton().getY() == fields.get(field.getNumber() - 1 - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() - 1 - 1));
+            }
+
+            // Right neighbour
+            if (field.getNumber() + 1 <= width * height && fields.get(field.getNumber() + 1 - 1) != null && field.getButton().getY() == fields.get(field.getNumber() + 1 - 1).getButton().getY()) {
                 field.addNeighbour(fields.get(field.getNumber() + 1 - 1));
             }
         }
@@ -107,28 +308,28 @@ public class Window extends JPanel {
     private void addHexNeighbours(ArrayList<Field> fields, int width, int height) {
         for (Field field : fields) {
             // Left neighbour
-            if (field.getNumber() - height > 0 && fields.get(field.getNumber() - height - 1) != null && field.getY() == fields.get(field.getNumber() - height - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() - height - 1));
-            }
-            // Right neighbour
-            if (field.getNumber() + height <= width * height && fields.get(field.getNumber() + height - 1) != null && field.getY() == fields.get(field.getNumber() + height - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() + height - 1));
-            }
-            // Down right neighbour
-            if (field.getNumber() + 1 <= width * height && fields.get(field.getNumber() + 1 - 1) != null && field.getY() < fields.get(field.getNumber() + 1 - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() + 1 - 1));
-            }
-            // Down left neighbour
-            if (field.getNumber() - height + 1 > 0 && fields.get(field.getNumber() - height + 1 - 1) != null && field.getY() < fields.get(field.getNumber() - height + 1 - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() - height + 1 - 1));
-            }
-            // Up left neighbour
-            if (field.getNumber() - 1 > 0 && fields.get(field.getNumber() - 1 - 1) != null && field.getY() > fields.get(field.getNumber() - 1 - 1).getY()) {
+            if (field.getNumber() - 1 > 0 && fields.get(field.getNumber() - 1 - 1) != null && field.getButton().getY() == fields.get(field.getNumber() - 1 - 1).getButton().getY()) {
                 field.addNeighbour(fields.get(field.getNumber() - 1 - 1));
             }
+            // Right neighbour
+            if (field.getNumber() + 1 <= width * height && fields.get(field.getNumber() + 1 - 1) != null && field.getButton().getY() == fields.get(field.getNumber() + 1 - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() + 1 - 1));
+            }
+            // Down right neighbour
+            if (field.getNumber() + width <= width * height && fields.get(field.getNumber() + width - 1) != null && field.getButton().getY() < fields.get(field.getNumber() + width - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() + width - 1));
+            }
+            // Down left neighbour
+            if (field.getNumber() + width - 1 <= width * height && fields.get(field.getNumber() + width - 1 - 1) != null && field.getButton().getY() < fields.get(field.getNumber() + width - 1 - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() + width - 1 - 1));
+            }
+            // Up left neighbour
+            if (field.getNumber() - width > 0 && fields.get(field.getNumber() - width - 1) != null && field.getButton().getY() > fields.get(field.getNumber() - width - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() - width - 1));
+            }
             // Up right neighbour
-            if (field.getNumber() + height - 1 <= width * height && fields.get(field.getNumber() + height - 1 - 1) != null  && field.getY() > fields.get(field.getNumber() + height - 1 - 1).getY()) {
-                field.addNeighbour(fields.get(field.getNumber() + height - 1 - 1));
+            if (field.getNumber() - width + 1 > 0 && fields.get(field.getNumber() - width + 1 - 1) != null  && field.getButton().getY() > fields.get(field.getNumber() - width + 1 - 1).getButton().getY()) {
+                field.addNeighbour(fields.get(field.getNumber() - width + 1 - 1));
             }
         }
     }
@@ -162,14 +363,6 @@ public class Window extends JPanel {
         String fileName = JOptionPane.showInputDialog(frame, "Enter the name of the file");
         if (fileName == null || fileName.isEmpty()) System.exit(0);
         return fileName;
-    }
-
-    public void setWindowSize(WorldType worldType, int worldWidth, int worldHeight) {
-        if (worldType == WorldType.HEXAGONAL) {
-            this.frame.setSize((worldWidth + worldHeight / 3 * 2) * FIELD_SIZE + WINDOW_OFFSET * 2, worldHeight * FIELD_SIZE + WINDOW_OFFSET * 3);
-        } else {
-            this.frame.setSize(worldWidth * FIELD_SIZE + WINDOW_OFFSET * 2, worldHeight * FIELD_SIZE + WINDOW_OFFSET * 3);
-        }
     }
 
     public void setVisible(boolean visible) {

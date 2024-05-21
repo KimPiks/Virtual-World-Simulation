@@ -23,29 +23,29 @@ public class Human extends Animal {
         this.currentField.setOrganism(null);
 
         switch (this.getMoveDirection()) {
-            case MoveDirection.Up:
+            case MoveDirection.UP:
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() - this.getWorld().getWorldSettings().width());
+                break;
+            case MoveDirection.DOWN:
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() + this.getWorld().getWorldSettings().width());
+                break;
+            case MoveDirection.LEFT:
                 this.currentField = this.getWorld().getField(this.currentField.getNumber() - 1);
                 break;
-            case MoveDirection.Down:
+            case MoveDirection.RIGHT:
                 this.currentField = this.getWorld().getField(this.currentField.getNumber() + 1);
-                break;
-            case MoveDirection.Left:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() - this.getWorld().getWorldSettings().height());
-                break;
-            case MoveDirection.Right:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() + this.getWorld().getWorldSettings().height());
                 break;
             case MoveDirection.UP_LEFT:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() - 1);
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() - this.world.getWorldSettings().width());
                 break;
             case MoveDirection.UP_RIGHT:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() + this.getWorld().getWorldSettings().height() - 1);
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() - this.getWorld().getWorldSettings().width() + 1);
                 break;
             case MoveDirection.DOWN_LEFT:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() - this.getWorld().getWorldSettings().height() + 1);
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() + this.getWorld().getWorldSettings().width() - 1);
                 break;
             case MoveDirection.DOWN_RIGHT:
-                this.currentField = this.getWorld().getField(this.currentField.getNumber() + 1);
+                this.currentField = this.getWorld().getField(this.currentField.getNumber() + this.world.getWorldSettings().width());
                 break;
             default:
                 break;
@@ -93,6 +93,5 @@ public class Human extends Animal {
     public void setMoveDirection(MoveDirection moveDirection) {
         this.moveDirection = moveDirection;
     }
-
 
 }

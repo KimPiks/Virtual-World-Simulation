@@ -3,7 +3,7 @@ package Field;
 import IconManager.IconManager;
 import Organism.Organism;
 import OrganismManager.*;
-import World.World;
+import World.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +14,6 @@ import java.util.ArrayList;
 public abstract class Field extends JPanel {
 
     protected final int number;
-    protected final int x;
-    protected final int y;
-    protected final int size;
     protected JButton button;
     protected Organism organism;
     protected ArrayList<Field> neighbours = new ArrayList<>();
@@ -24,12 +21,8 @@ public abstract class Field extends JPanel {
     private final IconManager iconManager;
     private final World world;
 
-    public Field(int fieldNumber, int x, int y, int size, IconManager iconManager, World world) {
+    public Field(int fieldNumber, IconManager iconManager, World world) {
         this.number = fieldNumber;
-        this.x = x;
-        this.y = y;
-        this.size = size;
-
         this.iconManager = iconManager;
         this.world = world;
     }
@@ -47,13 +40,15 @@ public abstract class Field extends JPanel {
 
         if (organism == null) {
             button.setIcon(null);
-            button.setText("" + this.getNumber());
             return;
         }
 
         try {
-            Image image = this.iconManager.getIcon(organism.getData().getIconPath());
-            button.setText("");
+            int fieldSize = this.getButton().getWidth() / 3 * 2;
+            if (this.world.getWorldSettings().worldType() == WorldType.RECTANGULAR && this.world.getWorldSettings().width() < this.world.getWorldSettings().height()) {
+                fieldSize = this.getButton().getHeight() / 3 * 2;
+            }
+            Image image = this.iconManager.getIcon(organism.getData().getIconPath(), fieldSize);
             button.setIcon(new ImageIcon(image));
         }
         catch (Exception e) {
@@ -76,6 +71,8 @@ public abstract class Field extends JPanel {
 
                 Field.this.setOrganism(organism);
                 world.addOrganism(organism);
+                world.handleButtons();
+                world.handleHumanAbility();
             }
         });
     }
@@ -92,13 +89,9 @@ public abstract class Field extends JPanel {
         return this.number;
     }
 
-    public int getX() {
-        return this.x;
+    public void showField(JPanel panel) {
+        this.button.setFocusPainted(false);
+        this.button.setContentAreaFilled(false);
+        panel.add(this.button);
     }
-
-    public int getY() {
-        return this.y;
-    }
-
-    public abstract void showField(JFrame frame);
 }
