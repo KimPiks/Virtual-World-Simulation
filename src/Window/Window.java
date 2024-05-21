@@ -32,7 +32,7 @@ public class Window extends JPanel {
 
     public Window() {
         this.frame = new JFrame();
-        this.frame.setTitle("Virtual World Simulation Kamil Prorok 201095");
+        this.frame.setTitle("Virtual World Simulation");
         this.frame.setResizable(true);
 
         this.addLabels();
